@@ -1,0 +1,35 @@
+/* ============================================
+   CONFIGURACIÓN DEL RESTAURANTE
+   Cambia estos valores para personalizar
+   ============================================ */
+
+:root {
+    /* Datos del restaurante */
+    --restaurant-name: "La Mesa";
+    --restaurant-slogan: "Sabores que cuentan historias";
+    --restaurant-description: "Cocina de autor en un entorno único";
+    --restaurant-logo: "🍽️";
+    --restaurant-year: "2024";
+    
+    /* Contacto */
+    --restaurant-phone: "+34 123 456 789";
+    --restaurant-email: "info@lamesa.com";
+    --restaurant-address: "Calle Principal 123, Madrid";
+    --restaurant-schedule: "Lun-Dom: 13:00-23:00";
+    
+    /* Moneda */
+    --currency-symbol: "€";
+    --currency-position: "after";
+    
+    /* Visibilidad */
+    --show-prices: true;
+    --show-allergens: true;
+    --show-featured-badge: true;
+    --show-descriptions: true;
+    
+    /* Textos de interfaz */
+    --text-featured: "⭐ Destacado";
+    --text-search-placeholder: "Buscar platos...";
+    --text-no-results: "No se encontraron platos";
+    --text-welcome-button: "✦ Ver Menú ✦";
+}

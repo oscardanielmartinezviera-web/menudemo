@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Menú Digital</title>
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/config-restaurant.css">
+    <link rel="stylesheet" href="css/cart.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: var(--current-font); background: var(--current-bg); color: var(--current-text); min-height: 100vh; overflow-x: hidden; }
+        .splash { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: var(--current-bg); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s, visibility 0.5s; }
+        .splash.oculto { opacity: 0; visibility: hidden; pointer-events: none; }
+        @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+        .s-logo { font-size: 5em; animation: pulse 1s infinite; }
+        .s-name { font-size: 2em; font-weight: 700; margin-top: 20px; color: var(--color-success); }
+        .s-bar { width: 200px; height: 4px; background: var(--current-border); margin-top: 30px; border-radius: 10px; overflow: hidden; }
+        .s-prog { height: 100%; background: var(--gradient-modern); border-radius: 10px; width: 0%; transition: width 0.1s; }
+        .app { width: 100%; padding: 20px; }
+        .header { text-align: center; padding: 40px 20px 30px; }
+        .badge { display: inline-block; background: var(--current-card-bg); border: 1px solid var(--current-border); padding: 8px 16px; border-radius: 20px; font-size: 0.8em; color: var(--current-accent); margin-bottom: 20px; letter-spacing: 2px; text-transform: uppercase; }
+        .title { font-size: 2.5em; font-weight: 900; color: var(--color-success); margin-bottom: 10px; }
+        .subtitle { color: var(--current-text-light); font-size: 1em; letter-spacing: 3px; text-transform: uppercase; }
+        .search-wrap { position: relative; margin: 20px 0; }
+        .search { width: 100%; padding: 15px 20px 15px 50px; background: var(--current-card-bg); border: 2px solid var(--current-border); border-radius: 15px; color: var(--current-text); font-size: 1em; font-family: var(--current-font); outline: none; }
+        .search:focus { border-color: var(--current-accent); }
+        .search::placeholder { color: var(--current-text-light); }
+        .s-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); }
+        .cat-scroll { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0 20px; scrollbar-width: none; }
+        .cat-scroll::-webkit-scrollbar { display: none; }
+        .chip { flex-shrink: 0; padding: 10px 20px; background: var(--current-card-bg); border: 1px solid var(--current-border); border-radius: 25px; color: var(--current-text-light); font-size: 0.9em; font-weight: 500; cursor: pointer; white-space: nowrap; position: relative; overflow: hidden; user-select: none; }
+        .chip::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--gradient-modern); opacity: 0; transition: opacity 0.3s; }
+        .chip.activo { color: #0a0a0a; border-color: transparent; font-weight: 600; transform: scale(1.05); }
+        .chip.activo::before { opacity: 1; }
+        .chip span { position: relative; z-index: 1; }
+        .grid { display: grid; gap: 15px; padding-bottom: 80px; }
+        .card { background: var(--current-card-bg); border: 1px solid var(--current-border); border-radius: 20px; padding: 20px; display: flex; gap: 15px; cursor: pointer; animation: appear 0.6s ease-out backwards; transition: all 0.2s; }
+        .card:active { transform: scale(0.98); border-color: var(--current-accent); }
+        .card:nth-child(1){animation-delay:0.1s} .card:nth-child(2){animation-delay:0.2s} .card:nth-child(3){animation-delay:0.3s} .card:nth-child(4){animation-delay:0.4s}
+        @keyframes appear { from{opacity:0;transform:scale(0.9)translateY(20px)} to{opacity:1;transform:scale(1)translateY(0)} }
+        .c-icon { width: 80px; height: 80px; background: var(--current-bg); border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 2.5em; flex-shrink: 0; }
+        .c-info { flex: 1; }
+        .c-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px; gap: 10px; }
+        .c-name { font-size: 1.1em; font-weight: 600; flex: 1; }
+        .c-price { font-size: 1.2em; font-weight: 700; color: var(--color-success); white-space: nowrap; }
+        .c-desc { color: var(--current-text-light); font-size: 0.85em; line-height: 1.5; margin-bottom: 10px; }
+        .tags { display: flex; gap: 8px; flex-wrap: wrap; }
+        .tag { padding: 4px 10px; border-radius: 10px; font-size: 0.75em; background: var(--current-bg); color: var(--current-text-light); border: 1px solid var(--current-border); }
+        .tag.dest { color: var(--current-accent); border-color: rgba(0,255,136,0.3); }
+        @media (min-width: 481px) { .grid { grid-template-columns: 1fr 1fr; } .card { flex-direction: column; } .c-icon { width: 100%; height: 120px; font-size: 3em; } }
+    </style>
+</head>
+<body data-level="3">
+    <div class="splash" id="splash">
+        <div class="s-logo" id="sLogo">🍽️</div>
+        <div class="s-name" id="sName">Cargando...</div>
+        <div class="s-bar"><div class="s-prog" id="sProg"></div></div>
+    </div>
+
+    <div class="app" id="app">
+        <div class="header">
+            <div class="badge">✦ Menú Digital</div>
+            <h1 class="title" id="rName">Cargando...</h1>
+            <p class="subtitle" id="rSub">...</p>
+        </div>
+        <div class="search-wrap">
+            <span class="s-icon">🔍</span>
+            <input type="text" class="search" placeholder="Buscar platos..." id="searchInput" oninput="filtrar()" autocomplete="off">
+        </div>
+        <div class="cat-scroll" id="catScroll"></div>
+        <div class="grid" id="dishesGrid"></div>
+    </div>
+
+    <script src="js/menu-content.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/orders-system.js"></script>
+    
+    <script>
+        // ============================================
+        // TODO EN UN SOLO BLOQUE
+        // ============================================
+        
+        var config = getMenuConfig();
+        var r = config.restaurant;
+        var cats = config.categories;
+        var s = config.settings;
+        var currentCat = 'todas';
+
+        // Inicializar sistemas
+        CartSystem.init();
+        OrdersSystem.init();
+
+        // Splash screen
+        document.getElementById('sLogo').textContent = r.logo;
+        document.getElementById('sName').textContent = r.name;
+        document.title = r.name + ' - Menú Digital';
+
+        var prog = document.getElementById('sProg');
+        var w = 0;
+        var intv = setInterval(function() {
+            w += 2;
+            prog.style.width = w + '%';
+            if (w >= 100) {
+                clearInterval(intv);
+                setTimeout(function() {
+                    document.getElementById('splash').classList.add('oculto');
+                    initApp();
+                }, 300);
+            }
+        }, 40);
+
+        function initApp() {
+            document.getElementById('rName').textContent = r.name;
+            document.getElementById('rSub').textContent = r.slogan.toUpperCase();
+            renderCats();
+            renderDishes();
+        }
+
+        function renderCats() {
+            var h = '<div class="chip activo" onclick="filterCat(\'todas\',this)"><span>Todos</span></div>';
+            cats.forEach(function(c) {
+                if (c.active) h += '<div class="chip" onclick="filterCat(\'' + c.id + '\',this)"><span>' + c.icon + ' ' + c.name + '</span></div>';
+            });
+            document.getElementById('catScroll').innerHTML = h;
+        }
+
+        function renderDishes(catId, query) {
+            var id = catId || currentCat;
+            var q = query || document.getElementById('searchInput')?.value || '';
+            var dishes = [];
+            
+            if (!id || id === 'todas') {
+                cats.forEach(function(c) { if (c.active) dishes = dishes.concat(c.items); });
+            } else {
+                var cat = cats.find(function(c) { return c.id === id; });
+                if (cat && cat.active) dishes = cat.items;
+            }
+            
+            if (q) {
+                var lq = q.toLowerCase();
+                dishes = dishes.filter(function(d) { return d.name.toLowerCase().includes(lq) || d.description.toLowerCase().includes(lq); });
+            }
+            
+            var container = document.getElementById('dishesGrid');
+            if (dishes.length === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--current-text-light);grid-column:1/-1;"><div style="font-size:3em;margin-bottom:20px;">🔍</div><p>No se encontraron platos</p></div>';
+                return;
+            }
+            
+            container.innerHTML = dishes.map(function(d, i) {
+                return '<div class="card" style="animation-delay:' + (i*0.1) + 's" onclick="CartSystem.addItem({id:' + d.id + ', name:\'' + d.name.replace(/'/g, '\\\'') + '\', price:' + d.price + ', icon:\'' + d.icon + '\'})">' +
+                    '<div class="c-icon">' + d.icon + '</div>' +
+                    '<div class="c-info">' +
+                        '<div class="c-header"><div class="c-name">' + d.name + '</div>' +
+                        (s.showPrices ? '<div class="c-price">' + formatPrice(d.price) + '</div>' : '') + '</div>' +
+                        (s.showDescriptions !== false ? '<div class="c-desc">' + d.description + '</div>' : '') +
+                        '<div class="tags">' +
+                            (d.featured ? '<span class="tag dest">⭐ Destacado</span>' : '') +
+                            (s.showAllergens && d.allergens ? d.allergens.map(function(a) { return '<span class="tag">' + a + '</span>'; }).join('') : '') +
+                        '</div>' +
+                    '</div></div>';
+            }).join('');
+        }
+
+        function filterCat(catId, chip) {
+            currentCat = catId;
+            document.querySelectorAll('.chip').forEach(function(c) { c.classList.remove('activo'); });
+            if (chip) chip.classList.add('activo');
+            renderDishes(catId);
+        }
+
+        function filtrar() {
+            renderDishes(currentCat);
+        }
+
+        function formatPrice(p) {
+            return s.currencyPosition === 'before' ? s.currency + p.toFixed(2) : p.toFixed(2) + s.currency;
+        }
+
+        document.addEventListener('menuConfigUpdated', function(e) {
+            config = e.detail;
+            r = config.restaurant;
+            cats = config.categories;
+            s = config.settings;
+            renderCats();
+            renderDishes();
+        });
+    </script>
+</body>
+</html>

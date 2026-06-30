@@ -1,0 +1,115 @@
+/* ============================================
+   SISTEMA DE VARIABLES GLOBAL
+   ============================================ */
+
+:root {
+    /* Colores principales */
+    --color-primary: #667eea;
+    --color-primary-dark: #5a6fd6;
+    --color-secondary: #764ba2;
+    --color-accent: #d4af37;
+    --color-accent-light: #ffd700;
+    --color-dark: #1a1a2e;
+    --color-dark-secondary: #2d3436;
+    --color-light: #ffffff;
+    --color-text: #2d3436;
+    --color-text-light: #636e72;
+    --color-text-muted: #a0a0a0;
+    --color-background: #f5f7fa;
+    --color-gold: #c9a96e;
+    --color-success: #00ff88;
+    --color-warning: #ffa502;
+    --color-danger: #ff4757;
+    
+    /* Tipografía */
+    --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    
+    /* Tamaños */
+    --font-size-xs: 0.65em;
+    --font-size-sm: 0.8em;
+    --font-size-md: 1em;
+    --font-size-lg: 1.1em;
+    --font-size-xl: 1.3em;
+    --font-size-xxl: 1.8em;
+    --font-size-huge: 2.2em;
+    --font-size-massive: 3em;
+    
+    /* Espaciado */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 12px;
+    --spacing-lg: 16px;
+    --spacing-xl: 20px;
+    --spacing-xxl: 30px;
+    --spacing-xxxl: 40px;
+    
+    /* Bordes */
+    --border-radius-sm: 8px;
+    --border-radius-md: 12px;
+    --border-radius-lg: 16px;
+    --border-radius-xl: 20px;
+    --border-radius-xxl: 24px;
+    --border-radius-round: 50%;
+    --border-radius-pill: 50px;
+    
+    /* Sombras */
+    --shadow-xs: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+    --shadow-md: 0 5px 15px rgba(0,0,0,0.1);
+    --shadow-lg: 0 10px 30px rgba(0,0,0,0.15);
+    --shadow-xl: 0 15px 40px rgba(0,0,0,0.2);
+    
+    /* Animaciones */
+    --transition-fast: 0.15s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.5s ease;
+    
+    /* Gradientes */
+    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-dark: linear-gradient(135deg, #2d3436 0%, #636e72 100%);
+    --gradient-premium: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    --gradient-gold: linear-gradient(135deg, #d4af37, #c9a96e);
+    --gradient-modern: linear-gradient(135deg, #00ff88 0%, #00b4d8 100%);
+}
+
+/* Nivel 1 - Básico */
+[data-level="1"] {
+    --current-font: var(--font-primary);
+    --current-bg: var(--gradient-primary);
+    --current-container-bg: rgba(255, 255, 255, 0.98);
+    --current-header-bg: var(--gradient-dark);
+    --current-card-bg: var(--color-light);
+    --current-text: var(--color-text);
+    --current-text-light: var(--color-text-light);
+    --current-accent: var(--color-primary);
+    --current-border: #f0f0f0;
+    --current-shadow: var(--shadow-sm);
+}
+
+/* Nivel 2 - Intermedio */
+[data-level="2"] {
+    --current-font: var(--font-primary);
+    --current-bg: var(--color-dark);
+    --current-container-bg: #f5f5f0;
+    --current-header-bg: var(--gradient-premium);
+    --current-card-bg: var(--color-light);
+    --current-text: #333333;
+    --current-text-light: #666666;
+    --current-accent: var(--color-accent);
+    --current-border: #e0e0e0;
+    --current-shadow: var(--shadow-sm);
+}
+
+/* Nivel 3 - Moderno */
+[data-level="3"] {
+    --current-font: var(--font-primary);
+    --current-bg: #0a0a0a;
+    --current-container-bg: #0a0a0a;
+    --current-header-bg: transparent;
+    --current-card-bg: #1a1a1a;
+    --current-text: var(--color-light);
+    --current-text-light: var(--color-text-muted);
+    --current-accent: var(--color-success);
+    --current-border: #2a2a2a;
+    --current-shadow: var(--shadow-sm);
+}

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Menú QR</title>
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/config-restaurant.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: var(--current-font); background: var(--current-bg); min-height: 100vh; }
+        .container { width: 100%; min-height: 100vh; background: var(--current-container-bg); }
+        .header { background: var(--current-header-bg); color: white; padding: 35px 20px 25px; text-align: center; position: sticky; top: 0; z-index: 10; }
+        .logo { font-size: var(--font-size-huge); font-weight: 800; margin-bottom: 5px; }
+        .slogan { font-size: var(--font-size-sm); opacity: 0.9; font-style: italic; }
+        .category-title { font-size: var(--font-size-xl); font-weight: 700; color: var(--current-text); padding: 20px 20px 10px; }
+        .menu-grid { display: grid; gap: 12px; padding: 10px 15px 20px; }
+        .menu-item { background: var(--current-card-bg); border-radius: var(--border-radius-lg); padding: 16px; display: flex; gap: 12px; align-items: center; border: 1px solid var(--current-border); box-shadow: var(--current-shadow); transition: all var(--transition-fast); }
+        .menu-item:active { transform: scale(0.97); }
+        .menu-item.destacado { border: 2px solid var(--current-accent); }
+        .badge-destacado { position: absolute; top: 8px; right: 8px; background: var(--current-accent); color: white; font-size: var(--font-size-xs); padding: 3px 8px; border-radius: 10px; font-weight: 600; }
+        .dish-icon { width: 60px; height: 60px; background: #f5f7fa; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 2em; flex-shrink: 0; }
+        .dish-info { flex: 1; min-width: 0; }
+        .item-name { font-size: var(--font-size-md); font-weight: 600; color: var(--current-text); margin-bottom: 4px; }
+        .item-description { font-size: var(--font-size-sm); color: var(--current-text-light); line-height: 1.4; margin-bottom: 6px; max-height: 2.8em; overflow: hidden; }
+        .item-price { font-size: var(--font-size-lg); font-weight: 700; color: var(--current-accent); }
+        .alergenos { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px; }
+        .alergeno-badge { font-size: var(--font-size-xs); background: #f0f0f0; padding: 2px 6px; border-radius: 8px; color: #666; }
+        .footer { background: var(--color-dark-secondary); color: white; text-align: center; padding: 20px; font-size: var(--font-size-sm); margin-top: auto; }
+        @media (min-width: 481px) { .menu-grid { grid-template-columns: 1fr 1fr; } .menu-item { flex-direction: column; text-align: center; } .dish-icon { margin: 0 auto; } }
+    </style>
+</head>
+<body data-level="1">
+    <div class="container" id="app"></div>
+
+    <script src="js/menu-content.js"></script>
+    <script>
+        var config = getMenuConfig();
+        var r = config.restaurant;
+        var cats = config.categories;
+        var s = config.settings;
+
+        function init() {
+            document.title = r.name + ' - Menú QR';
+            render();
+        }
+
+        function render() {
+            var h = '';
+            h += '<div class="header"><div class="logo">' + r.logo + ' ' + r.name + '</div><div class="slogan">' + r.slogan + '</div></div>';
+            
+            cats.forEach(function(c) {
+                if (c.active && c.items.length > 0) {
+                    h += '<div class="category-title">' + c.icon + ' ' + c.name + '</div><div class="menu-grid">';
+                    c.items.forEach(function(item) {
+                        h += '<div class="menu-item' + (item.featured ? ' destacado' : '') + '" style="position:relative;" onclick="CartSystem.addItem({id:' + item.id + ', name:\'' + item.name + '\', price:' + item.price + ', icon:\'' + item.icon + '\'})">';
+                        if (item.featured) h += '<div class="badge-destacado">⭐ Destacado</div>';
+                        h += '<div class="dish-icon">' + item.icon + '</div>';
+                        h += '<div class="dish-info">';
+                        h += '<div class="item-name">' + item.name + '</div>';
+                        h += '<div class="item-description">' + item.description + '</div>';
+                        h += '<div class="item-price">' + formatPrice(item.price) + '</div>';
+                        if (s.showAllergens && item.allergens && item.allergens.length > 0) {
+                            h += '<div class="alergenos">';
+                            item.allergens.forEach(function(a) { h += '<span class="alergeno-badge">' + a + '</span>'; });
+                            h += '</div>';
+                        }
+                        h += '</div></div>';
+                    });
+                    h += '</div>';
+                }
+            });
+            
+            h += '<div class="footer"><p>📞 ' + r.phone + '</p><p>📍 ' + r.address + '</p><p style="opacity:0.7;margin-top:5px;">© ' + r.year + ' ' + r.name + '</p></div>';
+            document.getElementById('app').innerHTML = h;
+        }
+
+        function formatPrice(p) {
+            return s.currencyPosition === 'before' ? s.currency + p.toFixed(2) : p.toFixed(2) + s.currency;
+        }
+
+        document.addEventListener('menuConfigUpdated', function(e) {
+            config = e.detail;
+            r = config.restaurant;
+            cats = config.categories;
+            s = config.settings;
+            render();
+        });
+
+        init();
+    </script>
+
+    <!-- Scripts del menú -->
+    <script src="js/menu-content.js"></script>
+    
+
+
+</body>
+</html>

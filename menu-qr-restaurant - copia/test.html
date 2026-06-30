@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test</title>
+</head>
+<body>
+    <h1>Probando conexiones...</h1>
+    <div id="resultado"></div>
+
+    <script src="js/menu-content.js"></script>
+    <script>
+        // Probar si carga menu-content.js
+        if (typeof getMenuConfig === 'function') {
+            var config = getMenuConfig();
+            document.getElementById('resultado').innerHTML = 
+                '<p style="color:green">✅ menu-content.js cargado</p>' +
+                '<p>Restaurante: ' + config.restaurant.name + '</p>' +
+                '<p>Categorías: ' + config.categories.length + '</p>';
+            console.log('✅ Éxito:', config);
+        } else {
+            document.getElementById('resultado').innerHTML = 
+                '<p style="color:red">❌ menu-content.js NO cargado</p>';
+        }
+    </script>
+</body>
+</html>

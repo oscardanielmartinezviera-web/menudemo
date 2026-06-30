@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Pedidos - Restaurante</title>
+    <link rel="stylesheet" href="css/variables.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-primary); background: #f5f5f0; min-height: 100vh; }
+        .panel { max-width: 900px; margin: 0 auto; padding: 20px; }
+        .panel-header { background: var(--gradient-dark); color: white; padding: 25px; border-radius: var(--border-radius-lg); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .panel-header h1 { font-size: 1.5em; }
+        .stats { display: flex; gap: 15px; flex-wrap: wrap; }
+        .stat { background: rgba(255,255,255,0.15); padding: 10px 15px; border-radius: var(--border-radius-sm); text-align: center; }
+        .stat-num { font-size: 1.8em; font-weight: 700; }
+        .stat-label { font-size: 0.75em; opacity: 0.8; }
+        .section-title { font-size: 1.2em; font-weight: 700; margin: 20px 0 10px; color: var(--color-text); display: flex; align-items: center; gap: 8px; }
+        .order-card { background: white; border-radius: var(--border-radius-lg); padding: 20px; margin-bottom: 12px; box-shadow: var(--shadow-sm); border-left: 4px solid var(--color-warning); }
+        .order-card.preparing { border-left-color: #3498db; }
+        .order-card.completed { border-left-color: var(--color-success); opacity: 0.7; }
+        .order-card.cancelled { border-left-color: var(--color-danger); opacity: 0.5; }
+        .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px; }
+        .order-table { font-size: 1.3em; font-weight: 700; }
+        .order-time { color: var(--color-text-light); font-size: 0.85em; }
+        .order-total { font-weight: 700; color: var(--color-accent); font-size: 1.1em; }
+        .order-items { margin-bottom: 12px; }
+        .order-item { padding: 8px 0; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 5px; }
+        .order-item:last-child { border-bottom: none; }
+        .item-qty { background: #f0f0f0; padding: 2px 8px; border-radius: 10px; font-size: 0.85em; margin-right: 8px; }
+        .item-comment { background: #fff9e6; border-left: 3px solid var(--color-warning); padding: 5px 10px; margin-top: 5px; font-size: 0.85em; border-radius: 4px; color: #666; display: inline-block; }
+        .order-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn { padding: 10px 18px; border: none; border-radius: var(--border-radius-sm); font-size: 0.9em; font-weight: 600; cursor: pointer; font-family: var(--font-primary); transition: all var(--transition-fast); }
+        .btn:active { transform: scale(0.95); }
+        .btn-accept { background: var(--color-success); color: white; }
+        .btn-reject { background: var(--color-danger); color: white; }
+        .btn-prepare { background: #3498db; color: white; }
+        .btn-complete { background: var(--color-success); color: white; }
+        .btn-delete { background: #e0e0e0; color: #666; }
+        .empty { text-align: center; padding: 60px 20px; color: var(--color-text-light); }
+        .empty-icon { font-size: 4em; margin-bottom: 20px; }
+        .actions-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .btn-export { background: var(--color-dark); color: white; }
+        .btn-clear { background: var(--color-danger); color: white; }
+        .notification { position: fixed; top: 20px; right: 20px; background: var(--color-success); color: white; padding: 15px 20px; border-radius: var(--border-radius-md); box-shadow: var(--shadow-lg); z-index: 1000; transform: translateX(120%); transition: transform 0.3s ease; font-weight: 600; }
+        .notification.show { transform: translateX(0); }
+        @media (max-width: 600px) { .panel { padding: 10px; } .panel-header { flex-direction: column; text-align: center; } .stats { justify-content: center; } .order-header { flex-direction: column; } }
+    </style>
+</head>
+<body>
+    <div class="panel">
+        <div class="panel-header">
+            <h1>🍽️ Panel de Pedidos</h1>
+            <div class="stats">
+                <div class="stat"><div class="stat-num" id="statPending">0</div><div class="stat-label">Pendientes</div></div>
+                <div class="stat"><div class="stat-num" id="statPreparing">0</div><div class="stat-label">En preparación</div></div>
+                <div class="stat"><div class="stat-num" id="statCompleted">0</div><div class="stat-label">Completados</div></div>
+                <div class="stat"><div class="stat-num" id="statRevenue">0€</div><div class="stat-label">Ingresos</div></div>
+            </div>
+        </div>
+
+        <div class="actions-bar">
+            <button class="btn btn-export" onclick="OrdersSystem.exportOrders()">📥 Exportar</button>
+            <button class="btn btn-clear" onclick="if(confirm('¿Eliminar pedidos completados?')){OrdersSystem.clearCompleted();renderAll();}">🗑️ Limpiar completados</button>
+        </div>
+
+        <div class="section-title">🕐 Pendientes</div>
+        <div id="pendingOrders"></div>
+
+        <div class="section-title">🔄 En preparación</div>
+        <div id="preparingOrders"></div>
+
+        <div class="section-title">✅ Completados</div>
+        <div id="completedOrders"></div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script src="js/orders-system.js"></script>
+    <script>
+        OrdersSystem.init();
+
+        function renderAll() {
+            var grouped = OrdersSystem.getOrdersGrouped();
+            var stats = OrdersSystem.getStats();
+            
+            document.getElementById('statPending').textContent = stats.pending;
+            document.getElementById('statPreparing').textContent = stats.preparing;
+            document.getElementById('statCompleted').textContent = stats.completed;
+            document.getElementById('statRevenue').textContent = stats.revenue.toFixed(2) + '€';
+            
+            document.getElementById('pendingOrders').innerHTML = renderOrders(grouped.pending, 'pending');
+            document.getElementById('preparingOrders').innerHTML = renderOrders(grouped.preparing, 'preparing');
+            document.getElementById('completedOrders').innerHTML = renderOrders(grouped.completed, 'completed');
+        }
+
+        function renderOrders(orders, status) {
+            if (!orders || orders.length === 0) {
+                return '<div class="empty"><div class="empty-icon">📭</div><p>No hay pedidos</p></div>';
+            }
+            
+            return orders.map(function(order) {
+                var time = new Date(order.timestamp).toLocaleTimeString('es-ES', {hour:'2-digit',minute:'2-digit'});
+                var itemsHtml = order.items.map(function(item) {
+                    var commentHtml = item.comment ? '<br><span class="item-comment">💬 ' + item.comment + '</span>' : '';
+                    return '<div class="order-item">' +
+                        '<span><span class="item-qty">' + item.quantity + 'x</span>' + item.name + commentHtml + '</span>' +
+                        '<span>' + (item.price * item.quantity).toFixed(2) + '€</span>' +
+                    '</div>';
+                }).join('');
+                
+                var actionsHtml = '';
+                if (status === 'pending') {
+                    actionsHtml = '<button class="btn btn-accept" onclick="updateStatus(\'' + order.id + '\',\'preparing\')">✅ Aceptar</button>' +
+                                  '<button class="btn btn-reject" onclick="updateStatus(\'' + order.id + '\',\'cancelled\')">❌ Rechazar</button>';
+                } else if (status === 'preparing') {
+                    actionsHtml = '<button class="btn btn-complete" onclick="updateStatus(\'' + order.id + '\',\'completed\')">✔️ Listo</button>';
+                } else if (status === 'completed') {
+                    actionsHtml = '<button class="btn btn-delete" onclick="OrdersSystem.deleteOrder(\'' + order.id + '\');renderAll();">🗑️</button>';
+                }
+                
+                return '<div class="order-card ' + status + '">' +
+                    '<div class="order-header">' +
+                        '<span><span class="order-table">🪑 Mesa ' + order.table + '</span><br><span class="order-time">' + time + '</span></span>' +
+                        '<span class="order-total">' + order.total.toFixed(2) + '€</span>' +
+                    '</div>' +
+                    '<div class="order-items">' + itemsHtml + '</div>' +
+                    '<div class="order-actions">' + actionsHtml + '</div>' +
+                '</div>';
+            }).join('');
+        }
+
+        function updateStatus(orderId, newStatus) {
+            OrdersSystem.updateOrderStatus(orderId, newStatus);
+            renderAll();
+            
+            if (newStatus === 'completed') {
+                showNotification('✅ Pedido completado - Mesa ' + OrdersSystem.findOrder(orderId).table);
+            }
+        }
+
+        function showNotification(msg) {
+            var notif = document.getElementById('notification');
+            notif.textContent = msg;
+            notif.classList.add('show');
+            setTimeout(function() { notif.classList.remove('show'); }, 3000);
+        }
+
+        OrdersSystem.addListener(function(event, data) {
+            renderAll();
+            if (event === 'new-order') {
+                showNotification('🔔 Nuevo pedido - Mesa ' + data.table);
+            }
+        });
+
+        renderAll();
+        
+        console.log('📊 Panel de pedidos listo');
+    </script>
+</body>
+</html>
