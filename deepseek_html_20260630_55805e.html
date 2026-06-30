@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generar QR - Menús</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; text-align: center; padding: 20px; background: #f5f5f0; }
+        h2 { margin-bottom: 30px; }
+        .qr-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; }
+        .qr-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .qr-card h3 { margin-bottom: 10px; }
+        .qr-card p { font-size: 0.8em; color: #666; margin-top: 10px; }
+        button { margin-top: 10px; padding: 8px 16px; cursor: pointer; border: none; border-radius: 5px; background: #667eea; color: white; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <h2>📱 QRs para Menú QR Restaurant</h2>
+    <p style="margin-bottom:20px;">URL base: <input type="text" id="baseUrl" placeholder="https://TUUSUARIO.github.io/menu-qr-restaurant/" style="padding:8px;width:300px;"></p>
+    
+    <div class="qr-container">
+        <div class="qr-card">
+            <h3>📄 Nivel 1 - Básico</h3>
+            <div id="qr1"></div>
+            <p>nivel1-basico.html</p>
+            <button onclick="descargarQR('qr1', 'menu-nivel1')">📥 Descargar</button>
+        </div>
+        
+        <div class="qr-card">
+            <h3>🎨 Nivel 2 - Intermedio</h3>
+            <div id="qr2"></div>
+            <p>nivel2-intermedio.html</p>
+            <button onclick="descargarQR('qr2', 'menu-nivel2')">📥 Descargar</button>
+        </div>
+        
+        <div class="qr-card">
+            <h3>🚀 Nivel 3 - Moderno</h3>
+            <div id="qr3"></div>
+            <p>nivel3-moderno.html</p>
+            <button onclick="descargarQR('qr3', 'menu-nivel3')">📥 Descargar</button>
+        </div>
+    </div>
+
+    <script>
+        var baseUrl = localStorage.getItem('baseUrl') || '';
+        document.getElementById('baseUrl').value = baseUrl;
+        
+        document.getElementById('baseUrl').addEventListener('input', function() {
+            localStorage.setItem('baseUrl', this.value);
+            generarQRs();
+        });
+        
+        function generarQRs() {
+            var base = document.getElementById('baseUrl').value;
+            if (!base.endsWith('/')) base += '/';
+            
+            ['qr1', 'qr2', 'qr3'].forEach(function(id) { document.getElementById(id).innerHTML = ''; });
+            
+            new QRCode(document.getElementById('qr1'), { text: base + 'nivel1-basico.html', width: 180, height: 180 });
+            new QRCode(document.getElementById('qr2'), { text: base + 'nivel2-intermedio.html', width: 180, height: 180 });
+            new QRCode(document.getElementById('qr3'), { text: base + 'nivel3-moderno.html', width: 180, height: 180 });
+        }
+        
+        function descargarQR(elementId, nombre) {
+            var canvas = document.querySelector('#' + elementId + ' canvas');
+            if (canvas) {
+                var link = document.createElement('a');
+                link.download = nombre + '.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }
+        }
+        
+        if (baseUrl) generarQRs();
+    </script>
+</body>
+</html>
